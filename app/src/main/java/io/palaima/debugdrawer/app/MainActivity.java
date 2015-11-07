@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +31,7 @@ import io.palaima.debugdrawer.location.LocationModule;
 import io.palaima.debugdrawer.log.LogModule;
 import io.palaima.debugdrawer.module.BuildModule;
 import io.palaima.debugdrawer.module.DeviceModule;
+import io.palaima.debugdrawer.module.EndpointsModule;
 import io.palaima.debugdrawer.module.NetworkModule;
 import io.palaima.debugdrawer.module.SettingsModule;
 import io.palaima.debugdrawer.okhttp.OkHttpModule;
@@ -64,29 +66,28 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         setupToolBar();
-        //change status bar color programmatically
-/*        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.primary_dark_material_light));
-        }*/
-
 
         if (BuildConfig.DEBUG) {
             SwitchAction switchAction = new SwitchAction("Test switch", new SwitchAction.Listener() {
                 @Override
                 public void onCheckedChanged(boolean value) {
-                    Toast.makeText(MainActivity.this, "Switch checked", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Switch checked", Toast.LENGTH_SHORT).show();
                 }
             });
 
             ButtonAction buttonAction = new ButtonAction("Test button", new ButtonAction.Listener() {
                 @Override
                 public void onClick() {
-                    Toast.makeText(MainActivity.this, "Button clicked", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Button clicked", Toast.LENGTH_SHORT).show();
                 }
             });
 
             mDebugDrawer = new DebugDrawer.Builder(this).modules(
+                    new EndpointsModule(Arrays.asList("first", "second"), new EndpointsModule.OnEndpointChanged() {
+                        @Override public void onEndpointChange(String urlText) {
+                            Toast.makeText(MainActivity.this, urlText, Toast.LENGTH_SHORT).show();
+                        }
+                    }),
                     new ActionsModule(switchAction, buttonAction),
                     new FpsModule(Takt.stock(getApplication())),
                     new LocationModule(this),
